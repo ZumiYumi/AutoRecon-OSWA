@@ -1,18 +1,17 @@
-> It's like bowling with bumpers. - [@ippsec](https://twitter.com/ippsec)
-
 # AutoRecon-OSWA
 
-AutoRecon is a multi-threaded network reconnaissance tool which performs automated enumeration of services. It is intended as a time-saving tool for use in CTFs and other penetration testing environments (e.g. OSWA). It may also be useful in real-world engagements.
+AutoRecon-OSWA is a multi-threaded network reconnaissance tool which performs automated enumeration of services. It is intended as a time-saving tool for use in CTFs and other penetration testing environments (e.g. OSWA). It may also be useful in real-world engagements.
 
 The tool works by firstly performing port scans / service detection scans. From those initial results, the tool will launch further enumeration scans of those services using a number of different tools. For example, if HTTP is found, feroxbuster will be launched (as well as many others).
 
 Everything in the tool is highly configurable. This configuration performs OSWA aligned **automated exploitation only with SQLmap** to keep the tool in line with OSWA exam rules. If you wish to add automatic exploit tools to the configuration, you do so at your own risk. The author will not be held responsible for negative actions that result from the mis-use of this tool.
 
-**Disclaimer: While AutoRecon endeavors to perform as much identification and enumeration of services as possible, there is no guarantee that every service will be identified, or that every service will be fully enumerated. Users of AutoRecon (especially students) should perform their own manual enumeration alongside AutoRecon. Do not rely on this tool alone for exams, CTFs, or other engagements.**
+**Disclaimer: While AutoRecon-OSWA endeavors to perform as much identification and enumeration of services as possible, there is no guarantee that every service will be identified, or that every service will be fully enumerated. Users of AutoRecon-OSWA (especially students) should perform their own manual enumeration alongside AutoRecon-OSWA. Do not rely on this tool alone for exams, CTFs, or other engagements.**
 
 ## Origin
 
-AutoRecon-OSWA was inspired by three tools which the author used during the OSCP labs: [Reconnoitre](https://github.com/codingo/Reconnoitre), [ReconScan](https://github.com/RoliSoft/ReconScan), and [bscan](https://github.com/welchbj/bscan). While all three tools were useful, none of the three alone had the functionality desired. AutoRecon combines the best features of the aforementioned tools while also implementing many new features to help testers with enumeration of multiple targets.
+AutoRecon was inspired by three tools which the original author Tib3rius used during the OSCP labs: [Reconnoitre](https://github.com/codingo/Reconnoitre), [ReconScan](https://github.com/RoliSoft/ReconScan), and [bscan](https://github.com/welchbj/bscan). While all three tools were useful, none of the three alone had the functionality desired. AutoRecon combines the best features of the aforementioned tools while also implementing many new features to help testers with enumeration of multiple targets.
+AutoRecon-OSWA is slightly modified version of the original that is better suited for web application enumeration and crawling using various tooling.
 
 ## Features
 
@@ -43,7 +42,7 @@ sudo apt update
 
 ### Python 3
 
-AutoRecon requires the usage of Python 3.8+ and pip, which can be installed on Kali Linux using the following commands:
+AutoRecon-OSWA requires the usage of Python 3.8+ and pip, which can be installed on Kali Linux using the following commands:
 
 ```bash
 sudo apt install python3
@@ -52,13 +51,13 @@ sudo apt install python3-pip
 
 ### Supporting Packages
 
-Several commands used in AutoRecon reference the SecLists project, in the directory /usr/share/seclists/. You can either manually download the SecLists project to this directory (https://github.com/danielmiessler/SecLists), or if you are using Kali Linux (**highly recommended**) you can run the following commands:
+Several commands used in AutoRecon-OSWA reference the SecLists project, in the directory /usr/share/seclists/. You can either manually download the SecLists project to this directory (https://github.com/danielmiessler/SecLists), or if you are using Kali Linux (**highly recommended**) you can run the following commands:
 
 ```bash
 sudo apt install seclists
 ```
 
-AutoRecon will still run if you do not install SecLists, though several commands may fail, and some manual commands may not run either.
+AutoRecon-OSWA will still run if you do not install SecLists, though several commands may fail, and some manual commands may not run either.
 
 Additionally the following commands may need to be installed, depending on your OS:
 
@@ -95,7 +94,7 @@ sudo apt install seclists curl dnsrecon enum4linux feroxbuster gobuster impacket
 
 ### Installation Method #1: pipx (Recommended)
 
-It is recommended you use `pipx` to install AutoRecon. pipx will install AutoRecon in it's own virtual environment, and make it available in the global context, avoiding conflicting package dependencies and the resulting instability. First, install pipx using the following commands:
+It is recommended you use `pipx` to install AutoRecon-OSWA. pipx will install AutoRecon-OSWA in it's own virtual environment, and make it available in the global context, avoiding conflicting package dependencies and the resulting instability. First, install pipx using the following commands:
 
 
 ```bash
@@ -106,13 +105,13 @@ python3 -m pipx ensurepath
 
 You will have to re-source your ~/.bashrc or ~/.zshrc file (or open a new tab) after running these commands in order to use pipx.
 
-Install AutoRecon using the following command:
+Install AutoRecon-OSWA using the following command:
 
 ```bash
 pipx install git+https://github.com/ZumiYumi/AutoRecon-OSWA.git
 ```
 
-Note that if you want to run AutoRecon using sudo (required for faster SYN scanning and UDP scanning), you have to use _one_ of the following examples:
+Note that if you want to run AutoRecon-OSWA using sudo (required for faster SYN scanning and UDP scanning), you have to use _one_ of the following examples:
 
 ```bash
 sudo env "PATH=$PATH" autorecon-oswa [OPTIONS]
@@ -121,19 +120,19 @@ sudo $(which autorecon-oswa) [OPTIONS]
 
 ### Installation Method #2: pip
 
-Alternatively you can use `pip` to install AutoRecon using the following command:
+Alternatively you can use `pip` to install AutoRecon-OSWA using the following command:
 
 ```bash
 python3 -m pip install git+https://github.com/ZumiYumi/AutoRecon-OSWA.git
 ```
 
-Note that if you want to run AutoRecon using sudo (required for faster SYN scanning and UDP scanning), you will have to run the above command as the root user (or using sudo).
+Note that if you want to run AutoRecon-OSWA using sudo (required for faster SYN scanning and UDP scanning), you will have to run the above command as the root user (or using sudo).
 
-Similarly to `pipx`, if installed using `pip` you can run AutoRecon by simply executing `autorecon-oswa`.
+Similarly to `pipx`, if installed using `pip` you can run AutoRecon-OSWA by simply executing `autorecon-oswa`.
 
 ### Installation Method #3: Manually
 
-If you'd prefer not to use `pip` or `pipx`, you can always still install and execute `autorecon-oswa.py` manually as a script. From within the AutoRecon directory, install the dependencies:
+If you'd prefer not to use `pip` or `pipx`, you can always still install and execute `autorecon-oswa.py` manually as a script. From within the AutoRecon-OSWA directory, install the dependencies:
 
 ```bash
 python3 -m pip install -r requirements.txt
