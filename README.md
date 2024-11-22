@@ -11,6 +11,7 @@ Everything in the tool is highly configurable. This configuration performs OSWA 
 ## Origin
 
 AutoRecon was inspired by three tools which the original author Tib3rius used during the OSCP labs: [Reconnoitre](https://github.com/codingo/Reconnoitre), [ReconScan](https://github.com/RoliSoft/ReconScan), and [bscan](https://github.com/welchbj/bscan). While all three tools were useful, none of the three alone had the functionality desired. AutoRecon combines the best features of the aforementioned tools while also implementing many new features to help testers with enumeration of multiple targets.
+
 AutoRecon-OSWA is slightly modified version of the original that is better suited for web application enumeration and crawling using various tooling.
 
 ## Features
