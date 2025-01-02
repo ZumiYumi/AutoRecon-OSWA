@@ -1,8 +1,8 @@
 import asyncio, inspect, os, re, sys
 from typing import final
-from autorecon.config import config
-from autorecon.io import slugify, info, warn, error, fail, CommandStreamReader
-from autorecon.targets import Service
+from autorecon-oswa.config import config
+from autorecon-oswa.io import slugify, info, warn, error, fail, CommandStreamReader
+from autorecon-oswa.targets import Service
 
 class Pattern:
 
@@ -19,48 +19,48 @@ class Plugin(object):
 		self.tags = ['default']
 		self.priority = 1
 		self.patterns = []
-		self.autorecon = None
+		self.autorecon-oswa = None
 		self.disabled = False
 
 	@final
 	def add_option(self, name, default=None, help=None):
-		self.autorecon.add_argument(self, name, metavar='VALUE', default=default, help=help)
+		self.autorecon-oswa.add_argument(self, name, metavar='VALUE', default=default, help=help)
 
 	@final
 	def add_constant_option(self, name, const, default=None, help=None):
-		self.autorecon.add_argument(self, name, action='store_const', const=const, default=default, help=help)
+		self.autorecon-oswa.add_argument(self, name, action='store_const', const=const, default=default, help=help)
 
 	@final
 	def add_true_option(self, name, help=None):
-		self.autorecon.add_argument(self, name, action='store_true', help=help)
+		self.autorecon-oswa.add_argument(self, name, action='store_true', help=help)
 
 	@final
 	def add_false_option(self, name, help=None):
-		self.autorecon.add_argument(self, name, action='store_false', help=help)
+		self.autorecon-oswa.add_argument(self, name, action='store_false', help=help)
 
 	@final
 	def add_list_option(self, name, default=None, help=None):
-		self.autorecon.add_argument(self, name, nargs='+', metavar='VALUE', default=default, help=help)
+		self.autorecon-oswa.add_argument(self, name, nargs='+', metavar='VALUE', default=default, help=help)
 
 	@final
 	def add_choice_option(self, name, choices, default=None, help=None):
 		if not isinstance(choices, list):
 			fail('The choices argument for ' + self.name + '\'s ' + name + ' choice option should be a list.')
-		self.autorecon.add_argument(self, name, choices=choices, default=default, help=help)
+		self.autorecon-oswa.add_argument(self, name, choices=choices, default=default, help=help)
 
 	@final
 	def get_option(self, name, default=None):
 		# TODO: make sure name is simple.
 		name = self.slug.replace('-', '_') + '.' + slugify(name).replace('-', '_')
 
-		if name in vars(self.autorecon.args):
-			if vars(self.autorecon.args)[name] is None:
+		if name in vars(self.autorecon-oswa.args):
+			if vars(self.autorecon-oswa.args)[name] is None:
 				if default:
 					return default
 				else:
 					return None
 			else:
-				return vars(self.autorecon.args)[name]
+				return vars(self.autorecon-oswa.args)[name]
 		else:
 			if default:
 				return default
@@ -70,14 +70,14 @@ class Plugin(object):
 	def get_global_option(self, name, default=None):
 		name = 'global.' + slugify(name).replace('-', '_')
 
-		if name in vars(self.autorecon.args):
-			if vars(self.autorecon.args)[name] is None:
+		if name in vars(self.autorecon-oswa.args):
+			if vars(self.autorecon-oswa.args)[name] is None:
 				if default:
 					return default
 				else:
 					return None
 			else:
-				return vars(self.autorecon.args)[name]
+				return vars(self.autorecon-oswa.args)[name]
 		else:
 			if default:
 				return default
@@ -349,7 +349,7 @@ class AutoRecon(object):
 			# Add plugin tags to tag list.
 			[self.taglist.append(t) for t in plugin.tags if t not in self.tags]
 
-			plugin.autorecon = self
+			plugin.autorecon-oswa = self
 			if configure_function_found:
 				plugin.configure()
 			self.plugins[plugin.slug] = plugin

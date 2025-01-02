@@ -1,4 +1,4 @@
-from autorecon.plugins import ServiceScan
+from autorecon-oswa.plugins import ServiceScan
 import os
 
 class SubdomainEnumeration(ServiceScan):

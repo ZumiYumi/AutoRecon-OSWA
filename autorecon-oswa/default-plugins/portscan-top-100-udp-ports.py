@@ -1,5 +1,5 @@
-from autorecon.plugins import PortScan
-from autorecon.config import config
+from autorecon-oswa.plugins import PortScan
+from autorecon-oswa.config import config
 import os, re
 
 class Top100UDPPortScan(PortScan):

@@ -1,5 +1,5 @@
-from autorecon.plugins import ServiceScan
-from autorecon.io import fformat
+from autorecon-oswa.plugins import ServiceScan
+from autorecon-oswa.io import fformat
 
 class WinRMDetection(ServiceScan):
 

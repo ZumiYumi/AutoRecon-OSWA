@@ -1,6 +1,6 @@
 import asyncio, colorama, os, re, string, sys, unidecode
 from colorama import Fore, Style
-from autorecon.config import config
+from autorecon-oswa.config import config
 
 def slugify(name):
 	return re.sub(r'[\W_]+', '-', unidecode.unidecode(name).lower()).strip('-')

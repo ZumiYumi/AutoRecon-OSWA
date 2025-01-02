@@ -1,16 +1,16 @@
 import asyncio, inspect, os
 from typing import final
-from autorecon.config import config
-from autorecon.io import e, info, warn, error
+from autorecon-oswa.config import config
+from autorecon-oswa.io import e, info, warn, error
 
 class Target:
 
-	def __init__(self, address, ip, ipversion, type, autorecon):
+	def __init__(self, address, ip, ipversion, type, autorecon-oswa):
 		self.address = address
 		self.ip = ip
 		self.ipversion = ipversion
 		self.type = type
-		self.autorecon = autorecon
+		self.autorecon-oswa = autorecon-oswa
 		self.basedir = ''
 		self.reportdir = ''
 		self.scandir = ''
@@ -26,10 +26,10 @@ class Target:
 			self.pending_services.append(service)
 
 	def extract_service(self, line, regex=None):
-		return self.autorecon.extract_service(line, regex)
+		return self.autorecon-oswa.extract_service(line, regex)
 
 	async def extract_services(self, stream, regex=None):
-		return await self.autorecon.extract_services(stream, regex)
+		return await self.autorecon-oswa.extract_services(stream, regex)
 
 	@final
 	def info(self, msg, verbosity=0):
@@ -56,9 +56,9 @@ class Target:
 		ipaddressv6 = target.ip
 		scandir = target.scandir
 
-		nmap_extra = target.autorecon.args.nmap
-		if target.autorecon.args.nmap_append:
-			nmap_extra += ' ' + target.autorecon.args.nmap_append
+		nmap_extra = target.autorecon-oswa.args.nmap
+		if target.autorecon-oswa.args.nmap_append:
+			nmap_extra += ' ' + target.autorecon-oswa.args.nmap_append
 
 		if target.ipversion == 'IPv6':
 			nmap_extra += ' -6'
@@ -91,7 +91,7 @@ class Target:
 			with open(os.path.join(target.scandir, '_commands.log'), 'a') as file:
 				file.writelines(cmd + '\n\n')
 
-		process, stdout, stderr = await target.autorecon.execute(cmd, target, tag, patterns=plugin.patterns, outfile=outfile, errfile=errfile)
+		process, stdout, stderr = await target.autorecon-oswa.execute(cmd, target, tag, patterns=plugin.patterns, outfile=outfile, errfile=errfile)
 
 		target.running_tasks[tag]['processes'].append({'process': process, 'stderr': stderr, 'cmd': cmd})
 
@@ -172,9 +172,9 @@ class Service:
 		# Special cases for HTTP.
 		http_scheme = 'https' if 'https' in self.name or self.secure is True else 'http'
 
-		nmap_extra = target.autorecon.args.nmap
-		if target.autorecon.args.nmap_append:
-			nmap_extra += ' ' + target.autorecon.args.nmap_append
+		nmap_extra = target.autorecon-oswa.args.nmap
+		if target.autorecon-oswa.args.nmap_append:
+			nmap_extra += ' ' + target.autorecon-oswa.args.nmap_append
 
 		if protocol == 'udp':
 			nmap_extra += ' -sU'
@@ -212,7 +212,7 @@ class Service:
 			with open(os.path.join(target.scandir, '_commands.log'), 'a') as file:
 				file.writelines(cmd + '\n\n')
 
-		process, stdout, stderr = await target.autorecon.execute(cmd, target, tag, patterns=plugin.patterns, outfile=outfile, errfile=errfile)
+		process, stdout, stderr = await target.autorecon-oswa.execute(cmd, target, tag, patterns=plugin.patterns, outfile=outfile, errfile=errfile)
 
 		target.running_tasks[tag]['processes'].append({'process': process, 'stderr': stderr, 'cmd': cmd})
 

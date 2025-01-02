@@ -12,10 +12,10 @@ except ModuleNotFoundError:
 
 colorama.init()
 
-from autorecon.config import config, configurable_keys, configurable_boolean_keys
-from autorecon.io import slugify, e, fformat, cprint, debug, info, warn, error, fail, CommandStreamReader
-from autorecon.plugins import Pattern, PortScan, ServiceScan, Report, AutoRecon
-from autorecon.targets import Target, Service
+from autorecon-oswa.config import config, configurable_keys, configurable_boolean_keys
+from autorecon-oswa.io import slugify, e, fformat, cprint, debug, info, warn, error, fail, CommandStreamReader
+from autorecon-oswa.plugins import Pattern, PortScan, ServiceScan, Report, AutoRecon
+from autorecon-oswa.targets import Target, Service
 
 VERSION = "2.0.35"
 
@@ -52,7 +52,7 @@ else:
 # Saves current terminal settings so we can restore them.
 terminal_settings = None
 
-autorecon = AutoRecon()
+autorecon-oswa = AutoRecon()
 
 def calculate_elapsed_time(start_time, short=False):
 	elapsed_seconds = round(time.time() - start_time)
@@ -101,7 +101,7 @@ def cancel_all_tasks(sig, frame):
 
 	processes = []
 
-	for target in autorecon.scanning_targets:
+	for target in autorecon-oswa.scanning_targets:
 		for process_list in target.running_tasks.values():
 			for process_dict in process_list['processes']:
 				try:
@@ -191,7 +191,7 @@ async def keyboard():
 
 				if len(input) > 0 and input[0] == 's':
 					input = input[1:]
-					for target in autorecon.scanning_targets:
+					for target in autorecon-oswa.scanning_targets:
 						async with target.lock:
 							count = len(target.running_tasks)
 
@@ -232,31 +232,31 @@ async def keyboard():
 					input = input[1:]
 		await asyncio.sleep(0.1)
 
-async def get_semaphore(autorecon):
-	semaphore = autorecon.service_scan_semaphore
+async def get_semaphore(autorecon-oswa):
+	semaphore = autorecon-oswa.service_scan_semaphore
 	while True:
 		# If service scan semaphore is locked, see if we can use port scan semaphore.
 		if semaphore.locked():
-			if semaphore != autorecon.port_scan_semaphore: # This will be true unless user sets max_scans == max_port_scans
+			if semaphore != autorecon-oswa.port_scan_semaphore: # This will be true unless user sets max_scans == max_port_scans
 
 				port_scan_task_count = 0
-				for target in autorecon.scanning_targets:
+				for target in autorecon-oswa.scanning_targets:
 					for process_list in target.running_tasks.values():
 						if issubclass(process_list['plugin'].__class__, PortScan):
 							port_scan_task_count += 1
 
-				if not autorecon.pending_targets and (config['max_port_scans'] - port_scan_task_count) >= 1: # If no more targets, and we have room, use port scan semaphore.
-					if autorecon.port_scan_semaphore.locked():
+				if not autorecon-oswa.pending_targets and (config['max_port_scans'] - port_scan_task_count) >= 1: # If no more targets, and we have room, use port scan semaphore.
+					if autorecon-oswa.port_scan_semaphore.locked():
 						await asyncio.sleep(1)
 						continue
-					semaphore = autorecon.port_scan_semaphore
+					semaphore = autorecon-oswa.port_scan_semaphore
 					break
 				else: # Do some math to see if we can use the port scan semaphore.
-					if (config['max_port_scans'] - (port_scan_task_count + (len(autorecon.pending_targets) * config['port_scan_plugin_count']))) >= 1:
-						if autorecon.port_scan_semaphore.locked():
+					if (config['max_port_scans'] - (port_scan_task_count + (len(autorecon-oswa.pending_targets) * config['port_scan_plugin_count']))) >= 1:
+						if autorecon-oswa.port_scan_semaphore.locked():
 							await asyncio.sleep(1)
 							continue
-						semaphore = autorecon.port_scan_semaphore
+						semaphore = autorecon-oswa.port_scan_semaphore
 						break
 					else:
 						await asyncio.sleep(1)
@@ -285,7 +285,7 @@ async def port_scan(plugin, target):
 					warn('Port scan {bblue}' + plugin.name + ' {green}(' + plugin.slug + '){rst} is a UDP port scan but no UDP ports were set using --ports. Skipping', verbosity=2)
 					return {'type':'port', 'plugin':plugin, 'result':[]}
 
-	async with target.autorecon.port_scan_semaphore:
+	async with target.autorecon-oswa.port_scan_semaphore:
 		info('Port scan {bblue}' + plugin.name + ' {green}(' + plugin.slug + '){rst} running against {byellow}' + target.address + '{rst}', verbosity=1)
 
 		start_time = time.time()
@@ -332,10 +332,10 @@ async def port_scan(plugin, target):
 		return {'type':'port', 'plugin':plugin, 'result':result}
 
 async def service_scan(plugin, service):
-	semaphore = service.target.autorecon.service_scan_semaphore
+	semaphore = service.target.autorecon-oswa.service_scan_semaphore
 
 	if not config['force_services']:
-		semaphore = await get_semaphore(service.target.autorecon)
+		semaphore = await get_semaphore(service.target.autorecon-oswa)
 
 	plugin_pending = True
 
@@ -344,9 +344,9 @@ async def service_scan(plugin, service):
 		target_plugin_count = 0
 
 		if plugin.max_global_instances and plugin.max_global_instances > 0:
-			async with service.target.autorecon.lock:
+			async with service.target.autorecon-oswa.lock:
 				# Count currently running plugin instances.
-				for target in service.target.autorecon.scanning_targets:
+				for target in service.target.autorecon-oswa.scanning_targets:
 					for task in target.running_tasks.values():
 						if plugin == task['plugin']:
 							global_plugin_count += 1
@@ -392,9 +392,9 @@ async def service_scan(plugin, service):
 			# Special cases for HTTP.
 			http_scheme = 'https' if 'https' in service.name or service.secure is True else 'http'
 
-			nmap_extra = service.target.autorecon.args.nmap
-			if service.target.autorecon.args.nmap_append:
-				nmap_extra += ' ' + service.target.autorecon.args.nmap_append
+			nmap_extra = service.target.autorecon-oswa.args.nmap
+			if service.target.autorecon-oswa.args.nmap_append:
+				nmap_extra += ' ' + service.target.autorecon-oswa.args.nmap_append
 
 			if protocol == 'udp':
 				nmap_extra += ' -sU'
@@ -456,10 +456,10 @@ async def service_scan(plugin, service):
 			return {'type':'service', 'plugin':plugin, 'result':result}
 
 async def generate_report(plugin, targets):
-	semaphore = autorecon.service_scan_semaphore
+	semaphore = autorecon-oswa.service_scan_semaphore
 
 	if not config['force_services']:
-		semaphore = await get_semaphore(autorecon)
+		semaphore = await get_semaphore(autorecon-oswa)
 
 	async with semaphore:
 		try:
@@ -533,10 +533,10 @@ async def scan_target(target):
 		else:
 			error('No services were defined. Please check your service syntax: [tcp|udp]/<port>/<service-name>/[secure|insecure]')
 			heartbeat.cancel()
-			autorecon.errors = True
+			autorecon-oswa.errors = True
 			return
 	else:
-		for plugin in target.autorecon.plugin_types['port']:
+		for plugin in target.autorecon-oswa.plugin_types['port']:
 			if config['proxychains'] and plugin.type == 'udp':
 				continue
 
@@ -547,13 +547,13 @@ async def scan_target(target):
 				plugin_tag_set = set(plugin.tags)
 
 				matching_tags = False
-				for tag_group in target.autorecon.tags:
+				for tag_group in target.autorecon-oswa.tags:
 					if set(tag_group).issubset(plugin_tag_set):
 						matching_tags = True
 						break
 
 				excluded_tags = False
-				for tag_group in target.autorecon.excluded_tags:
+				for tag_group in target.autorecon-oswa.excluded_tags:
 					if set(tag_group).issubset(plugin_tag_set):
 						excluded_tags = True
 						break
@@ -562,8 +562,8 @@ async def scan_target(target):
 				target.scans['ports'][plugin.slug] = {'plugin':plugin, 'commands':[]}
 				pending.append(asyncio.create_task(port_scan(plugin, target)))
 
-	async with autorecon.lock:
-		autorecon.scanning_targets.append(target)
+	async with autorecon-oswa.lock:
+		autorecon-oswa.scanning_targets.append(target)
 
 	start_time = time.time()
 	info('Scanning target {byellow}' + target.address + '{rst}')
@@ -631,9 +631,9 @@ async def scan_target(target):
 			# Special cases for HTTP.
 			http_scheme = 'https' if 'https' in service.name or service.secure is True else 'http'
 
-			nmap_extra = target.autorecon.args.nmap
-			if target.autorecon.args.nmap_append:
-				nmap_extra += ' ' + target.autorecon.args.nmap_append
+			nmap_extra = target.autorecon-oswa.args.nmap
+			if target.autorecon-oswa.args.nmap_append:
+				nmap_extra += ' ' + target.autorecon-oswa.args.nmap_append
 
 			if protocol == 'udp':
 				nmap_extra += ' -sU'
@@ -651,7 +651,7 @@ async def scan_target(target):
 			matching_plugins = []
 			heading = False
 
-			for plugin in target.autorecon.plugin_types['service']:
+			for plugin in target.autorecon-oswa.plugin_types['service']:
 				plugin_was_run = False
 				plugin_service_match = False
 				plugin_tag = service.tag() + '/' + plugin.slug
@@ -680,13 +680,13 @@ async def scan_target(target):
 							plugin_tag_set = set(plugin.tags)
 
 							matching_tags = False
-							for tag_group in target.autorecon.tags:
+							for tag_group in target.autorecon-oswa.tags:
 								if set(tag_group).issubset(plugin_tag_set):
 									matching_tags = True
 									break
 
 							excluded_tags = False
-							for tag_group in target.autorecon.excluded_tags:
+							for tag_group in target.autorecon-oswa.excluded_tags:
 								if set(tag_group).issubset(plugin_tag_set):
 									excluded_tags = True
 									break
@@ -800,10 +800,10 @@ async def scan_target(target):
 
 			if not service_match:
 				warn('{byellow}[' + target.address + ']{srst} Service ' + service.full_tag() + ' did not match any plugins based on the service name.{rst}', verbosity=2)
-				if service.name not in config['service_exceptions'] and service.full_tag() not in target.autorecon.missing_services:
-					target.autorecon.missing_services.append(service.full_tag())
+				if service.name not in config['service_exceptions'] and service.full_tag() not in target.autorecon-oswa.missing_services:
+					target.autorecon-oswa.missing_services.append(service.full_tag())
 
-	for plugin in target.autorecon.plugin_types['report']:
+	for plugin in target.autorecon-oswa.plugin_types['report']:
 		if config['reports'] and plugin.slug in config['reports']:
 			matching_tags = True
 			excluded_tags = False
@@ -811,13 +811,13 @@ async def scan_target(target):
 			plugin_tag_set = set(plugin.tags)
 
 			matching_tags = False
-			for tag_group in target.autorecon.tags:
+			for tag_group in target.autorecon-oswa.tags:
 				if set(tag_group).issubset(plugin_tag_set):
 					matching_tags = True
 					break
 
 			excluded_tags = False
-			for tag_group in target.autorecon.excluded_tags:
+			for tag_group in target.autorecon-oswa.excluded_tags:
 				if set(tag_group).issubset(plugin_tag_set):
 					excluded_tags = True
 					break
@@ -847,9 +847,9 @@ async def scan_target(target):
 	else:
 		info('Finished scanning target {byellow}' + target.address + '{rst} in ' + elapsed_time)
 
-	async with autorecon.lock:
-		autorecon.completed_targets.append(target)
-		autorecon.scanning_targets.remove(target)
+	async with autorecon-oswa.lock:
+		autorecon-oswa.completed_targets.append(target)
+		autorecon-oswa.scanning_targets.remove(target)
 
 async def run():
 	# Find config file.
@@ -910,7 +910,7 @@ async def run():
 
 	errors = False
 
-	autorecon.argparse = parser
+	autorecon-oswa.argparse = parser
 
 	if args.version:
 		print('AutoRecon v' + VERSION)
@@ -979,13 +979,13 @@ async def run():
 				dirname = os.path.abspath(dirname)
 
 				try:
-					spec = importlib.util.spec_from_file_location("autorecon." + filename[:-3], os.path.join(dirname, filename))
+					spec = importlib.util.spec_from_file_location("autorecon-oswa." + filename[:-3], os.path.join(dirname, filename))
 					plugin = importlib.util.module_from_spec(spec)
 					spec.loader.exec_module(plugin)
 
 					clsmembers = inspect.getmembers(plugin, predicate=inspect.isclass)
 					for (_, c) in clsmembers:
-						if c.__module__ in ['autorecon.plugins', 'autorecon.targets']:
+						if c.__module__ in ['autorecon-oswa.plugins', 'autorecon-oswa.targets']:
 							continue
 
 						if c.__name__.lower() in config['protected_classes']:
@@ -995,7 +995,7 @@ async def run():
 
 						# Only add classes that are a sub class of either PortScan, ServiceScan, or Report
 						if issubclass(c, PortScan) or issubclass(c, ServiceScan) or issubclass(c, Report):
-							autorecon.register(c(), filename)
+							autorecon-oswa.register(c(), filename)
 						else:
 							print('Plugin "' + c.__name__ + '" in ' + filename + ' is not a subclass of either PortScan, ServiceScan, or Report.')
 				except (ImportError, SyntaxError) as ex:
@@ -1004,21 +1004,21 @@ async def run():
 					print(ex)
 					sys.exit(1)
 
-	for plugin in autorecon.plugins.values():
-		if plugin.slug in autorecon.taglist:
+	for plugin in autorecon-oswa.plugins.values():
+		if plugin.slug in autorecon-oswa.taglist:
 			unknown_help()
 			fail('Plugin ' + plugin.name + ' has a slug (' + plugin.slug + ') with the same name as a tag. Please either change the plugin name or override the slug.')
 		# Add plugin slug to tags.
 		plugin.tags += [plugin.slug]
 
-	if len(autorecon.plugin_types['port']) == 0:
+	if len(autorecon-oswa.plugin_types['port']) == 0:
 		unknown_help()
 		fail('Error: There are no valid PortScan plugins in the plugins directory "' + config['plugins_dir'] + '".')
 
 	# Sort plugins by priority.
-	autorecon.plugin_types['port'].sort(key=lambda x: x.priority)
-	autorecon.plugin_types['service'].sort(key=lambda x: x.priority)
-	autorecon.plugin_types['report'].sort(key=lambda x: x.priority)
+	autorecon-oswa.plugin_types['port'].sort(key=lambda x: x.priority)
+	autorecon-oswa.plugin_types['service'].sort(key=lambda x: x.priority)
+	autorecon-oswa.plugin_types['report'].sort(key=lambda x: x.priority)
 
 	if not config['global_file']:
 		unknown_help()
@@ -1084,9 +1084,9 @@ async def run():
 							try:
 								compiled = re.compile(pattern['pattern'])
 								if 'description' in pattern:
-									autorecon.patterns.append(Pattern(compiled, description=pattern['description']))
+									autorecon-oswa.patterns.append(Pattern(compiled, description=pattern['description']))
 								else:
-									autorecon.patterns.append(Pattern(compiled))
+									autorecon-oswa.patterns.append(Pattern(compiled))
 							except re.error:
 								unknown_help()
 								fail('Error: The pattern "' + pattern['pattern'] + '" in the global file is invalid regex.')
@@ -1103,18 +1103,18 @@ async def run():
 		if key == 'global' and isinstance(val, dict): # Process global plugin options.
 			for gkey, gval in config_toml['global'].items():
 				if isinstance(gval, bool):
-					for action in autorecon.argparse._actions:
+					for action in autorecon-oswa.argparse._actions:
 						if action.dest == 'global.' + slugify(gkey).replace('-', '_'):
 							if action.const is True:
 								action.__setattr__('default', gval)
 							break
 				else:
-					if autorecon.argparse.get_default('global.' + slugify(gkey).replace('-', '_')):
-						autorecon.argparse.set_defaults(**{'global.' + slugify(gkey).replace('-', '_'): gval})
+					if autorecon-oswa.argparse.get_default('global.' + slugify(gkey).replace('-', '_')):
+						autorecon-oswa.argparse.set_defaults(**{'global.' + slugify(gkey).replace('-', '_'): gval})
 		elif isinstance(val, dict): # Process potential plugin arguments.
 			for pkey, pval in config_toml[key].items():
-				if autorecon.argparse.get_default(slugify(key).replace('-', '_') + '.' + slugify(pkey).replace('-', '_')) is not None:
-					for action in autorecon.argparse._actions:
+				if autorecon-oswa.argparse.get_default(slugify(key).replace('-', '_') + '.' + slugify(pkey).replace('-', '_')) is not None:
+					for action in autorecon-oswa.argparse._actions:
 						if action.dest == slugify(key).replace('-', '_') + '.' + slugify(pkey).replace('-', '_'):
 							if action.const and pval != action.const:
 								if action.const in [True, False]:
@@ -1129,17 +1129,17 @@ async def run():
 								error('Config option [' + slugify(key) + '] ' + slugify(pkey) + ': invalid value: \'' + pval + '\' (should be a list e.g. [\'' + pval + '\'])')
 								errors = True
 							break
-					autorecon.argparse.set_defaults(**{slugify(key).replace('-', '_') + '.' + slugify(pkey).replace('-', '_'): pval})
+					autorecon-oswa.argparse.set_defaults(**{slugify(key).replace('-', '_') + '.' + slugify(pkey).replace('-', '_'): pval})
 		else: # Process potential other options.
 			key = key.replace('-', '_')
 			if key in configurable_keys:
 				other_options.append(key)
 				config[key] = val
-				autorecon.argparse.set_defaults(**{key: val})
+				autorecon-oswa.argparse.set_defaults(**{key: val})
 
 	for key, val in config.items():
 		if key not in other_options:
-			autorecon.argparse.set_defaults(**{key: val})
+			autorecon-oswa.argparse.set_defaults(**{key: val})
 
 	parser.add_argument('-h', '--help', action='help', default=argparse.SUPPRESS, help='Show this help message and exit.')
 	parser.error = lambda s: fail(s[0].upper() + s[1:])
@@ -1152,18 +1152,18 @@ async def run():
 			if key in configurable_boolean_keys and config[key]:
 				continue
 			config[key] = args_dict[key]
-	autorecon.args = args
+	autorecon-oswa.args = args
 
 	if args.list:
 		type = args.list.lower()
 		if type in ['plugin', 'plugins', 'port', 'ports', 'portscan', 'portscans']:
-			for p in autorecon.plugin_types['port']:
+			for p in autorecon-oswa.plugin_types['port']:
 				print('PortScan: ' + p.name + ' (' + p.slug + ')' + (' - ' + p.description if p.description else ''))
 		if type in ['plugin', 'plugins', 'service', 'services', 'servicescan', 'servicescans']:
-			for p in autorecon.plugin_types['service']:
+			for p in autorecon-oswa.plugin_types['service']:
 				print('ServiceScan: ' + p.name + ' (' + p.slug + ')' + (' - ' + p.description if p.description else ''))
 		if type in ['plugin', 'plugins', 'report', 'reports', 'reporting']:
-			for p in autorecon.plugin_types['report']:
+			for p in autorecon-oswa.plugin_types['report']:
 				print('Report: ' + p.name + ' (' + p.slug + ')' + (' - ' + p.description if p.description else ''))
 
 		sys.exit(0)
@@ -1173,7 +1173,7 @@ async def run():
 		for plugin_instance in config['max_plugin_target_instances']:
 			plugin_instance = plugin_instance.split(':', 1)
 			if len(plugin_instance) == 2:
-				if plugin_instance[0] not in autorecon.plugins:
+				if plugin_instance[0] not in autorecon-oswa.plugins:
 					error('Invalid plugin slug (' + plugin_instance[0] + ':' + plugin_instance[1] + ') provided to --max-plugin-target-instances.')
 					errors = True
 				elif not plugin_instance[1].isdigit() or int(plugin_instance[1]) == 0:
@@ -1189,7 +1189,7 @@ async def run():
 		for plugin_instance in config['max_plugin_global_instances']:
 			plugin_instance = plugin_instance.split(':', 1)
 			if len(plugin_instance) == 2:
-				if plugin_instance[0] not in autorecon.plugins:
+				if plugin_instance[0] not in autorecon-oswa.plugins:
 					error('Invalid plugin slug (' + plugin_instance[0] + ':' + plugin_instance[1] + ') provided to --max-plugin-global-instances.')
 					errors = True
 				elif not plugin_instance[1].isdigit() or int(plugin_instance[1]) == 0:
@@ -1200,7 +1200,7 @@ async def run():
 			else:
 				error('Invalid value provided to --max-plugin-global-instances. Values must be in the format PLUGIN:NUMBER.')
 
-	for slug, plugin in autorecon.plugins.items():
+	for slug, plugin in autorecon-oswa.plugins.items():
 		if hasattr(plugin, 'max_target_instances') and plugin.slug in max_plugin_target_instances:
 			plugin.max_target_instances = max_plugin_target_instances[plugin.slug]
 
@@ -1210,7 +1210,7 @@ async def run():
 		for member_name, _ in inspect.getmembers(plugin, predicate=inspect.ismethod):
 			if member_name == 'check':
 				if plugin.check() == False:
-					autorecon.plugins.pop(slug)
+					autorecon-oswa.plugins.pop(slug)
 					continue
 				continue
 
@@ -1322,21 +1322,21 @@ async def run():
 
 	if not errors:
 		if config['force_services']:
-			autorecon.service_scan_semaphore = asyncio.Semaphore(config['max_scans'])
+			autorecon-oswa.service_scan_semaphore = asyncio.Semaphore(config['max_scans'])
 		else:
-			autorecon.port_scan_semaphore = asyncio.Semaphore(config['max_port_scans'])
+			autorecon-oswa.port_scan_semaphore = asyncio.Semaphore(config['max_port_scans'])
 			# If max scans and max port scans is the same, the service scan semaphore and port scan semaphore should be the same object
 			if config['max_scans'] == config['max_port_scans']:
-				autorecon.service_scan_semaphore = autorecon.port_scan_semaphore
+				autorecon-oswa.service_scan_semaphore = autorecon-oswa.port_scan_semaphore
 			else:
-				autorecon.service_scan_semaphore = asyncio.Semaphore(config['max_scans'] - config['max_port_scans'])
+				autorecon-oswa.service_scan_semaphore = asyncio.Semaphore(config['max_scans'] - config['max_port_scans'])
 
 	tags = []
 	for tag_group in list(set(filter(None, args.tags.lower().split(',')))):
 		tags.append(list(set(filter(None, tag_group.split('+')))))
 
 	# Remove duplicate lists from list.
-	[autorecon.tags.append(t) for t in tags if t not in autorecon.tags]
+	[autorecon-oswa.tags.append(t) for t in tags if t not in autorecon-oswa.tags]
 
 	excluded_tags = []
 	if args.exclude_tags is None:
@@ -1346,7 +1346,7 @@ async def run():
 			excluded_tags.append(list(set(filter(None, tag_group.split('+')))))
 
 		# Remove duplicate lists from list.
-		[autorecon.excluded_tags.append(t) for t in excluded_tags if t not in autorecon.excluded_tags]
+		[autorecon-oswa.excluded_tags.append(t) for t in excluded_tags if t not in autorecon-oswa.excluded_tags]
 
 	if config['port_scans']:
 		config['port_scans'] = [x.strip().lower() for x in config['port_scans'].split(',')]
@@ -1386,7 +1386,7 @@ async def run():
 			ip_str = str(ip)
 
 			found = False
-			for t in autorecon.pending_targets:
+			for t in autorecon-oswa.pending_targets:
 				if t.address == ip_str:
 					found = True
 					break
@@ -1395,9 +1395,9 @@ async def run():
 				continue
 
 			if isinstance(ip, ipaddress.IPv4Address):
-				autorecon.pending_targets.append(Target(ip_str, ip_str, 'IPv4', 'ip', autorecon))
+				autorecon-oswa.pending_targets.append(Target(ip_str, ip_str, 'IPv4', 'ip', autorecon-oswa))
 			elif isinstance(ip, ipaddress.IPv6Address):
-				autorecon.pending_targets.append(Target(ip_str, ip_str, 'IPv6', 'ip', autorecon))
+				autorecon-oswa.pending_targets.append(Target(ip_str, ip_str, 'IPv6', 'ip', autorecon-oswa))
 			else:
 				fail('This should never happen unless IPv8 is invented.')
 		except ValueError:
@@ -1412,7 +1412,7 @@ async def run():
 						ip_str = str(ip)
 
 						found = False
-						for t in autorecon.pending_targets:
+						for t in autorecon-oswa.pending_targets:
 							if t.address == ip_str:
 								found = True
 								break
@@ -1421,9 +1421,9 @@ async def run():
 							continue
 
 						if isinstance(ip, ipaddress.IPv4Address):
-							autorecon.pending_targets.append(Target(ip_str, ip_str, 'IPv4', 'ip', autorecon))
+							autorecon-oswa.pending_targets.append(Target(ip_str, ip_str, 'IPv4', 'ip', autorecon-oswa))
 						elif isinstance(ip, ipaddress.IPv6Address):
-							autorecon.pending_targets.append(Target(ip_str, ip_str, 'IPv6', 'ip', autorecon))
+							autorecon-oswa.pending_targets.append(Target(ip_str, ip_str, 'IPv6', 'ip', autorecon-oswa))
 						else:
 							fail('This should never happen unless IPv8 is invented.')
 
@@ -1434,7 +1434,7 @@ async def run():
 					ip = addresses[0][4][0]
 
 					found = False
-					for t in autorecon.pending_targets:
+					for t in autorecon-oswa.pending_targets:
 						if t.address == target:
 							found = True
 							break
@@ -1442,14 +1442,14 @@ async def run():
 					if found:
 						continue
 
-					autorecon.pending_targets.append(Target(target, ip, 'IPv4', 'hostname', autorecon))
+					autorecon-oswa.pending_targets.append(Target(target, ip, 'IPv4', 'hostname', autorecon-oswa))
 				except socket.gaierror:
 					try:
 						addresses = socket.getaddrinfo(target, None, socket.AF_INET6)
 						ip = addresses[0][4][0]
 
 						found = False
-						for t in autorecon.pending_targets:
+						for t in autorecon-oswa.pending_targets:
 							if t.address == target:
 								found = True
 								break
@@ -1457,7 +1457,7 @@ async def run():
 						if found:
 							continue
 
-						autorecon.pending_targets.append(Target(target, ip, 'IPv6', 'hostname', autorecon))
+						autorecon-oswa.pending_targets.append(Target(target, ip, 'IPv6', 'hostname', autorecon-oswa))
 					except socket.gaierror:
 						unresolvable_targets = True
 						error(target + ' does not appear to be a valid IP address, IP range, or resolvable hostname.')
@@ -1466,33 +1466,33 @@ async def run():
 		error('AutoRecon will not run if any targets are invalid / unresolvable. To override this, re-run with the --disable-sanity-checks option.')
 		errors = True
 
-	if len(autorecon.pending_targets) == 0:
+	if len(autorecon-oswa.pending_targets) == 0:
 		error('You must specify at least one target to scan!')
 		errors = True
 
-	if config['single_target'] and len(autorecon.pending_targets) != 1:
+	if config['single_target'] and len(autorecon-oswa.pending_targets) != 1:
 		error('You cannot provide more than one target when scanning in single-target mode.')
 		errors = True
 
-	if not args.disable_sanity_checks and len(autorecon.pending_targets) > 256:
-		error('A total of ' + str(len(autorecon.pending_targets)) + ' targets would be scanned. If this is correct, re-run with the --disable-sanity-checks option to suppress this check.')
+	if not args.disable_sanity_checks and len(autorecon-oswa.pending_targets) > 256:
+		error('A total of ' + str(len(autorecon-oswa.pending_targets)) + ' targets would be scanned. If this is correct, re-run with the --disable-sanity-checks option to suppress this check.')
 		errors = True
 
 	if not config['force_services']:
 		port_scan_plugin_count = 0
-		for plugin in autorecon.plugin_types['port']:
+		for plugin in autorecon-oswa.plugin_types['port']:
 			if config['port_scans'] and plugin.slug in config['port_scans']:
 				matching_tags = True
 				excluded_tags = False
 			else:
 				matching_tags = False
-				for tag_group in autorecon.tags:
+				for tag_group in autorecon-oswa.tags:
 					if set(tag_group).issubset(set(plugin.tags)):
 						matching_tags = True
 						break
 
 				excluded_tags = False
-				for tag_group in autorecon.excluded_tags:
+				for tag_group in autorecon-oswa.excluded_tags:
 					if set(tag_group).issubset(set(plugin.tags)):
 						excluded_tags = True
 						break
@@ -1520,8 +1520,8 @@ async def run():
 
 	pending = []
 	i = 0
-	while autorecon.pending_targets:
-		pending.append(asyncio.create_task(scan_target(autorecon.pending_targets.pop(0))))
+	while autorecon-oswa.pending_targets:
+		pending.append(asyncio.create_task(scan_target(autorecon-oswa.pending_targets.pop(0))))
 		i+=1
 		if i >= num_initial_targets:
 			break
@@ -1534,8 +1534,8 @@ async def run():
 	while pending:
 		done, pending = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED, timeout=1)
 
-		# If something failed in scan_target, autorecon.errors will be true.
-		if autorecon.errors:
+		# If something failed in scan_target, autorecon-oswa.errors will be true.
+		if autorecon-oswa.errors:
 			cancel_all_tasks(None, None)
 			sys.exit(1)
 
@@ -1548,13 +1548,13 @@ async def run():
 				break
 
 		for task in done:
-			if autorecon.pending_targets:
-				pending.add(asyncio.create_task(scan_target(autorecon.pending_targets.pop(0))))
+			if autorecon-oswa.pending_targets:
+				pending.add(asyncio.create_task(scan_target(autorecon-oswa.pending_targets.pop(0))))
 			if task in pending:
 				pending.remove(task)
 
 		port_scan_task_count = 0
-		for targ in autorecon.scanning_targets:
+		for targ in autorecon-oswa.scanning_targets:
 			for process_list in targ.running_tasks.values():
 				# If we're not scanning ports, count ServiceScans instead.
 				if config['force_services']:
@@ -1567,8 +1567,8 @@ async def run():
 		num_new_targets = math.ceil((config['max_port_scans'] - port_scan_task_count) / port_scan_plugin_count)
 		if num_new_targets > 0:
 			i = 0
-			while autorecon.pending_targets:
-				pending.add(asyncio.create_task(scan_target(autorecon.pending_targets.pop(0))))
+			while autorecon-oswa.pending_targets:
+				pending.add(asyncio.create_task(scan_target(autorecon-oswa.pending_targets.pop(0))))
 				i+=1
 				if i >= num_new_targets:
 					break
@@ -1577,8 +1577,8 @@ async def run():
 		keyboard_monitor.cancel()
 
 	# If there's only one target we don't need a combined report
-	if len(autorecon.completed_targets) > 1:
-		for plugin in autorecon.plugin_types['report']:
+	if len(autorecon-oswa.completed_targets) > 1:
+		for plugin in autorecon-oswa.plugin_types['report']:
 			if config['reports'] and plugin.slug in config['reports']:
 				matching_tags = True
 				excluded_tags = False
@@ -1586,19 +1586,19 @@ async def run():
 				plugin_tag_set = set(plugin.tags)
 
 				matching_tags = False
-				for tag_group in autorecon.tags:
+				for tag_group in autorecon-oswa.tags:
 					if set(tag_group).issubset(plugin_tag_set):
 						matching_tags = True
 						break
 
 				excluded_tags = False
-				for tag_group in autorecon.excluded_tags:
+				for tag_group in autorecon-oswa.excluded_tags:
 					if set(tag_group).issubset(plugin_tag_set):
 						excluded_tags = True
 						break
 
 			if matching_tags and not excluded_tags:
-				pending.add(asyncio.create_task(generate_report(plugin, autorecon.completed_targets)))
+				pending.add(asyncio.create_task(generate_report(plugin, autorecon-oswa.completed_targets)))
 
 		while pending:
 			done, pending = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED, timeout=1)
@@ -1616,8 +1616,8 @@ async def run():
 		info('{bright}Finished scanning all targets in ' + elapsed_time + '!{rst}')
 		info('{bright}Don\'t forget to check out more commands to run manually in the _manual_commands.txt file in each target\'s scans directory!')
 
-	if autorecon.missing_services:
-		warn('{byellow}AutoRecon identified the following services, but could not match them to any plugins based on the service name. Please report these to Tib3rius: ' + ', '.join(autorecon.missing_services) + '{rst}')
+	if autorecon-oswa.missing_services:
+		warn('{byellow}AutoRecon identified the following services, but could not match them to any plugins based on the service name. Please report these to Tib3rius: ' + ', '.join(autorecon-oswa.missing_services) + '{rst}')
 
 	if not config['disable_keyboard_control']:
 		# Restore original terminal settings.

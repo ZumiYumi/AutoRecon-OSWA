@@ -1,4 +1,4 @@
-from autorecon.plugins import ServiceScan
+from autorecon-oswa.plugins import ServiceScan
 from shutil import which
 import os, requests, random, string, urllib3
 urllib3.disable_warnings()
