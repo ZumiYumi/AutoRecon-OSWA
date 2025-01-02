@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from autorecon.main import main
+from autorecon-oswa.main import main
 
 if __name__ == '__main__':
 	main()
