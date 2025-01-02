@@ -1,5 +1,5 @@
-from autorecon-oswa.plugins import ServiceScan
-from autorecon-oswa.config import config
+from autorecon_oswa.plugins import ServiceScan
+from autorecon_oswa.config import config
 from shutil import which
 import os
 

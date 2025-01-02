@@ -115,8 +115,8 @@ pipx install git+https://github.com/ZumiYumi/AutoRecon-OSWA.git
 Note that if you want to run AutoRecon-OSWA using sudo (required for faster SYN scanning and UDP scanning), you have to use _one_ of the following examples:
 
 ```bash
-sudo env "PATH=$PATH" autorecon-oswa [OPTIONS]
-sudo $(which autorecon-oswa) [OPTIONS]
+sudo env "PATH=$PATH" autorecon_oswa [OPTIONS]
+sudo $(which autorecon_oswa) [OPTIONS]
 ```
 
 ### Installation Method #2: pip
@@ -129,20 +129,20 @@ python3 -m pip install git+https://github.com/ZumiYumi/AutoRecon-OSWA.git
 
 Note that if you want to run AutoRecon-OSWA using sudo (required for faster SYN scanning and UDP scanning), you will have to run the above command as the root user (or using sudo).
 
-Similarly to `pipx`, if installed using `pip` you can run AutoRecon-OSWA by simply executing `autorecon-oswa`.
+Similarly to `pipx`, if installed using `pip` you can run AutoRecon-OSWA by simply executing `autorecon_oswa`.
 
 ### Installation Method #3: Manually
 
-If you'd prefer not to use `pip` or `pipx`, you can always still install and execute `autorecon-oswa.py` manually as a script. From within the AutoRecon-OSWA directory, install the dependencies:
+If you'd prefer not to use `pip` or `pipx`, you can always still install and execute `autorecon_oswa.py` manually as a script. From within the AutoRecon-OSWA directory, install the dependencies:
 
 ```bash
 python3 -m pip install -r requirements.txt
 ```
 
-You will then be able to run the `autorecon-oswa.py` script:
+You will then be able to run the `autorecon_oswa.py` script:
 
 ```bash
-python3 autorecon-oswa.py [OPTIONS] 127.0.0.1
+python3 autorecon_oswa.py [OPTIONS] 127.0.0.1
 ```
 
 ## Upgrading
@@ -152,7 +152,7 @@ python3 autorecon-oswa.py [OPTIONS] 127.0.0.1
 Upgrading AutoRecon-OSWA when it has been installed with pipx is the easiest, and is why the method is recommended. Simply run the following command:
 
 ```bash
-pipx upgrade autorecon-oswa
+pipx upgrade autorecon_oswa
 ```
 
 ### pip
@@ -160,7 +160,7 @@ pipx upgrade autorecon-oswa
 If you've installed AutoRecon-OSWA using pip, you will first have to uninstall AutoRecon-OSWA and then re-install using the same install command:
 
 ```bash
-python3 -m pip uninstall autorecon-oswa
+python3 -m pip uninstall autorecon_oswa
 python3 -m pip install git+https://github.com/ZumiYumi/AutoRecon-OSWA.git
 ```
 
@@ -172,7 +172,7 @@ If you've installed AutoRecon-OSWA manually, simply change to the AutoRecon-OSWA
 git pull
 ```
 
-Assuming you did not modify any of the content in the AutoRecon-OSWA directory, this should pull the latest code from this GitHub repo, after which you can run AutoRecon-OSWA using the autorecon-oswa.py script as per usual.
+Assuming you did not modify any of the content in the AutoRecon-OSWA directory, this should pull the latest code from this GitHub repo, after which you can run AutoRecon-OSWA using the autorecon_oswa.py script as per usual.
 
 ### Plugins
 
@@ -183,7 +183,7 @@ A plugin update process is in the works. Until then, after upgrading, remove the
 AutoRecon-OSWA uses Python 3 specific functionality and does not support Python 2.
 
 ```
-usage: autorecon-oswa [-t TARGET_FILE] [-p PORTS] [-m MAX_SCANS] [-mp MAX_PORT_SCANS] [-c CONFIG_FILE] [-g GLOBAL_FILE] [--tags TAGS]
+usage: autorecon_oswa [-t TARGET_FILE] [-p PORTS] [-m MAX_SCANS] [-mp MAX_PORT_SCANS] [-c CONFIG_FILE] [-g GLOBAL_FILE] [--tags TAGS]
                  [--exclude-tags TAGS] [--port-scans PLUGINS] [--service-scans PLUGINS] [--reports PLUGINS] [--plugins-dir PLUGINS_DIR]
                  [--add-plugins-dir PLUGINS_DIR] [-l [TYPE]] [-o OUTPUT] [--single-target] [--only-scans-dir] [--no-port-dirs]
                  [--heartbeat HEARTBEAT] [--timeout TIMEOUT] [--target-timeout TARGET_TIMEOUT] [--nmap NMAP | --nmap-append NMAP_APPEND]

@@ -1,5 +1,5 @@
-from autorecon-oswa.plugins import PortScan
-from autorecon-oswa.targets import Service
+from autorecon_oswa.plugins import PortScan
+from autorecon_oswa.targets import Service
 import re
 
 class GuessPortScan(PortScan):

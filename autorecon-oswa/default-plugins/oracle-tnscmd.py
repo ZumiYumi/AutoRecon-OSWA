@@ -1,4 +1,4 @@
-from autorecon-oswa.plugins import ServiceScan
+from autorecon_oswa.plugins import ServiceScan
 from shutil import which
 
 class OracleTNScmd(ServiceScan):

@@ -1,5 +1,5 @@
-from autorecon-oswa.plugins import PortScan
-from autorecon-oswa.config import config
+from autorecon_oswa.plugins import PortScan
+from autorecon_oswa.config import config
 import re, requests
 
 class AllTCPPortScan(PortScan):

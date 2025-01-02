@@ -1,5 +1,5 @@
-from autorecon-oswa.plugins import Report
-from autorecon-oswa.config import config
+from autorecon_oswa.plugins import Report
+from autorecon_oswa.config import config
 from xml.sax.saxutils import escape
 import os, glob
 
