@@ -2,7 +2,7 @@
 name = "autorecon-oswa"
 version = "2.0.36"
 description = "A multi-threaded network reconnaissance tool which performs automated enumeration of services."
-authors = ["Tib3rius", ["Zumi Yumi"]
+authors = ["Tib3rius", "Zumi Yumi"]
 license = "GNU GPL v3"
 exclude = ["autorecon-oswa.py"]
 packages = [
