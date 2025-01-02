@@ -6,7 +6,7 @@ authors = ["Tib3rius", "Zumi Yumi"]
 license = "GNU GPL v3"
 exclude = ["autorecon-oswa.py"]
 packages = [
-	{ include = "autorecon-oswa" },
+	{ include = "autorecon" },
 ]
 
 [tool.poetry.dependencies]
