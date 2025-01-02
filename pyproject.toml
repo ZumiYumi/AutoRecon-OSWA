@@ -6,7 +6,7 @@ authors = ["Tib3rius", "Zumi Yumi"]
 license = "GNU GPL v3"
 exclude = ["autorecon-oswa.py"]
 packages = [
-	{ include = "autorecon" },
+	{ include = "autorecon-oswa" },
 ]
 
 [tool.poetry.dependencies]
@@ -22,7 +22,7 @@ Unidecode = "^1.3.1"
 [tool.poetry.dev-dependencies]
 
 [tool.poetry.scripts]
-autorecon = "autorecon.main:main"
+autorecon-oswa = "autorecon-oswa.main:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
