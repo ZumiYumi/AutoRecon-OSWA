@@ -17,7 +17,7 @@ from autorecon_oswa.io import slugify, e, fformat, cprint, debug, info, warn, er
 from autorecon_oswa.plugins import Pattern, PortScan, ServiceScan, Report, AutoRecon
 from autorecon_oswa.targets import Target, Service
 
-VERSION = "2.0.35"
+VERSION = "2.0.36"
 
 if not os.path.exists(config['config_dir']):
 	shutil.rmtree(config['config_dir'], ignore_errors=True, onerror=None)
